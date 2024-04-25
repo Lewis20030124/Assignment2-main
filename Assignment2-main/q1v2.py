@@ -65,7 +65,7 @@ class UkkonenSuffixTree:
 
 
         #testing 
-        self.visualize_tree(0).render('suffix_tree_visualization', view=True)
+        #self.visualize_tree(0).render('suffix_tree_visualization', view=True)
 
     def rapid_leaf_extension(self, i):
         """
@@ -183,18 +183,36 @@ class UkkonenSuffixTree:
         remain_edge_index = (j, node.index[1])
         print("new_edge_index", new_edge_index, remain_edge_index)
 
-        #create new node
-        new_node = Node(edge=new_edge, index=new_edge_index)
-        #change the old node
+        #create new internal node
+        new_internal_node = Node(edge=new_edge, index=new_edge_index)
+
+        #update the leaf node
         node.edge = remain_edge
         node.index = remain_edge_index
 
-        #add the new node to the tree
-        self.root_node[self.active_node].ch.append(len(self.root_node))
+        #new character edge 
+        new_char_edge = self.orginal_string[j+1:i+1]
+        print("new_char_edge", new_char_edge)
+
+        #create new leaf node
+        new_leaf_node = Node(edge=new_char_edge, index=(j+1, i), leaf_num=self.leaf_count)
+        self.leaf_count += 1
+
+        #add the new leaf node and orginal node to the new internal node
+        new_internal_node.ch.append(edge)
+
+        #update the active node's children
+        self.root_node[self.active_node].ch[self.active_node_child] = len(self.root_node)
+        self.root_node.append(new_internal_node)
+        self.root_node.append(new_leaf_node)
+        
+
 
         
 
 
+        self.visualize_tree(0).render('suffix_tree_visualization', view=True)
+        #update lastj
         self.lastj = j
 
     def visualize_tree(self, node_index, graph=None, parent_name=None, edge_label=''):

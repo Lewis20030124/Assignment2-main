@@ -3,6 +3,10 @@ digraph {
 	Root [label=Root]
 	"1 (0, 3)" [label="1 (0, 3)"]
 	Root -> "1 (0, 3)" [label=abba]
+	"U (1, 2)" [label="U (1, 2)"]
+	Root -> "U (1, 2)" [label=b]
 	Root [label=Root]
-	Root -> Root [label=""]
+	"U (1, 2)" -> Root [label=""]
+	"2 (2, 3)" [label="2 (2, 3)"]
+	Root -> "2 (2, 3)" [label=ba]
 }
