@@ -37,6 +37,7 @@ class UkkonenSuffixTree:
         #do the first char to begin with 
         self.root_node[0].ch.append(1)
         self.root_node.append(Node(edge=self.orginal_string[0:self.global_end], index=(0, self.global_end-1), leaf_num=self.leaf_count))
+        print("+++++leaf count")
         self.leaf_count += 1
 
         #loop through the string
@@ -65,7 +66,7 @@ class UkkonenSuffixTree:
 
 
         #testing 
-        #self.visualize_tree(0).render('suffix_tree_visualization', view=True)
+        self.visualize_tree(0).render('suffix_tree_visualization', view=True)
 
     def rapid_leaf_extension(self, i):
         """
@@ -96,31 +97,40 @@ class UkkonenSuffixTree:
         nodes = self.root_node[self.active_node]
         print("=====traverse", self.lastj, len(nodes.ch))
 
+        length = (0,len(nodes.ch))
+
         #return false if there is path, means no extension needed
-        for node_index in range(len(nodes.ch)):
-            print("node_index", node_index, len(nodes.ch), self.root_node[node_index].edge, nodes.ch)
+        for node_index in range(length[0], length[1]):
+            print("node_index", node_index, len(nodes.ch), self.root_node[node_index].edge, nodes.ch, self.active_node)
 
-            #get the active node's children
-            children = nodes.ch[node_index]
+            #get the active node's child
+            child = nodes.ch[node_index]
 
-            #get the edge of the children
-            edge = self.root_node[children].edge[:phase]
-            print("edge", edge, self.orginal_string[extension:phase+1], edge[:len(self.orginal_string[extension:phase+1])])
+            #get the edge of the child
+            edge = self.root_node[child].edge[:phase]
+            print("edge", edge, node_index, child)
             #if there is a path
             #this is checked by the if the last character of the edge is the same as the last character of the suffix string
 
-            self.active_node = node_index
+            #this is because i set the root node as node 0, the first node is index 1 
+            if length[0] == 0:      #if the active node is not the root node
+                self.active_node = node_index
+            else:                   #if the active node is the root node, because i want the children to start as index 0
+                self.active_node = node_index -1
+                print("-------------------------------------------------", self.active_node, node_index, child)
+
             self.active_edge = edge
             self.active_length = len(edge)
             #keep track of the child node
-            self.active_node_child = children
+            self.active_node_child = child
             #if there is a rule 3, return false
             edge_index = 0      #used to compare edge and suffix string
             temp_remainder = self.remainder
+            print(self.remainder, phase+1, edge, node_index)
             for k in range(self.remainder, phase+1):
                 #if the edge and the suffix string are the same and its not the last character of the suffix string
                 #then continue to check the next character, no rule apply here 
-                print("edge compare", edge[edge_index], self.orginal_string[k], k, phase)
+                print("edge compare1", edge[edge_index], self.orginal_string[k], k, phase)
                 if edge[edge_index] == self.orginal_string[k] and k != phase:
                     temp_remainder += 1
                 #if the edge and the suffix string are the same and its the last character of the suffix string
@@ -136,9 +146,9 @@ class UkkonenSuffixTree:
             for k in range(self.remainder, phase+1):
                 #if the edge and the suffix string are the same and its not the last character of the suffix string
                 #then continue to check the next character, no rule apply here 
+                print("edge compare2", edge[edge_index], self.orginal_string[k], k, phase, edge_index, len(edge))
                 if edge[edge_index] == self.orginal_string[k] and k != phase:
                     temp_remainder += 1
-                    continue
                 #if the edge and the suffix string are the same and its the last character of the suffix string
                 elif edge[edge_index] != self.orginal_string[k] and edge_index != 0:
                     print("rule 2 alter")
@@ -159,12 +169,13 @@ class UkkonenSuffixTree:
         if result == "2a":
             self.root_node[self.active_node].ch.append(len(self.root_node))
             self.root_node.append(Node(edge=self.orginal_string[j:self.global_end], index=(j, self.global_end-1), leaf_num=self.leaf_count))
+            print("+++++leaf count")
             self.leaf_count += 1
             print("lastj updated", self.lastj, j)
             self.lastj = j
         #rule 2 alter 
         else:
-            self.splitNode(j, i)
+            self.splitNode(j, i)            
     
     def splitNode(self, j, i):
         print("=============split node", j, i, "active node", self.active_node, self.active_node_child)
@@ -196,6 +207,7 @@ class UkkonenSuffixTree:
 
         #create new leaf node
         new_leaf_node = Node(edge=new_char_edge, index=(j+1, i), leaf_num=self.leaf_count)
+        print("+++++leaf count")
         self.leaf_count += 1
 
         #add the new leaf node and orginal node to the new internal node
@@ -204,15 +216,14 @@ class UkkonenSuffixTree:
         #update the active node's children
         self.root_node[self.active_node].ch[self.active_node_child] = len(self.root_node)
         self.root_node.append(new_internal_node)
+        
+        #add the new leaf node to the new internal node
         self.root_node.append(new_leaf_node)
+        new_internal_node.ch.append(self.leaf_count)
+        self.leaf_count += 1
         
-
-
-        
-
-
-        self.visualize_tree(0).render('suffix_tree_visualization', view=True)
         #update lastj
+        self.remainder += 1
         self.lastj = j
 
     def visualize_tree(self, node_index, graph=None, parent_name=None, edge_label=''):
