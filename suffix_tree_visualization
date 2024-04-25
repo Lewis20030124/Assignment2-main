@@ -1,0 +1,8 @@
+// Suffix Tree
+digraph {
+	Root [label=Root]
+	"1 (0, 3)" [label="1 (0, 3)"]
+	Root -> "1 (0, 3)" [label=abba]
+	Root [label=Root]
+	Root -> Root [label=""]
+}
