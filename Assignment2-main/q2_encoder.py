@@ -1,3 +1,4 @@
+import sys
 from bitarray import bitarray
 
 def encoder(s: str):
@@ -51,7 +52,10 @@ def encoder(s: str):
         elias_res = EliasCode(key[1])
         bitArray.extend(elias_res)
     
-    #
+    #padd the bitarray to make it a multiple of 8
+    while len(bitArray) % 8 != 0:
+        bitArray.extend('0')
+    return bitArray
 
 
 def bwt(s: str):
@@ -103,7 +107,7 @@ def rle(s: str) -> str:
 
 def EliasCode(num: int):
     """
-    This function implements the Elias Gamma Encoding
+    This function implements the Elias Omega Encoding
     Parameters:
     num: int, the input number
     Returns:
@@ -190,6 +194,18 @@ def assign_codes(node, prefix="", codebook={}):
         assign_codes(node.right, prefix + '1', codebook)
     return codebook
 
-if __name__ == "__main__":
-    print(encoder("banana"))
+def main(file_name):
+    """Read file, encode content, and write output."""
+    with open(file_name, 'r') as file:
+        input_string = file.read().strip()
     
+    encoded_bitarray = encoder(input_string)
+    
+    with open("q2_encoder_output.bin", "wb") as output_file:
+        output_file.write(encoded_bitarray.tobytes())
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python q2_encoder.py <stringFileName>")
+    else:
+        main(sys.argv[1])
