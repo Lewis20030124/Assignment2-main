@@ -26,7 +26,7 @@ def decode(ba: bitarray):
         #get the huffman code
         decoded_huffman_code = ba[next_section_start:next_section_start+length].to01()
         next_section_start = next_section_start + length
-        #store the huffman code
+        #store the huffman code, with key as the huffman code and value as the character
         huffman_result[decoded_huffman_code] = char
 
     print("Huffman result: ", huffman_result)
@@ -78,11 +78,6 @@ def reverse_bwt(bwt_res: str):
 
     # The original string ends with the original end-of-file character, so return the row that has it
     return table[orig_index]
-
-
-        
-
-
     
 def decode_elias(ba: bitarray, start_index):
     """
